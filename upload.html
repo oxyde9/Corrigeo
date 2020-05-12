@@ -14,16 +14,17 @@
 
   </style>
   <body>
+  <h1>Corrigéo</h1>
     <div class="container">
     <form >
     <div class="form-group">
-      <label for="exampleFormControlFile1">Upload les fichiers</label>
+      <label for="exampleFormControlFile1">Merci de charger un fichier : </label>
       <input type="file" class="form-control-file" id="files">
     </div>
   </form>
   <span class="readBytesButtons">
     
-    <button>Lire le dossier</button>
+    <button>Lire le fichier</button>
   </span>
 
   <div id="byte_content"></div>
@@ -47,17 +48,15 @@
     
       var blob = file.slice(start, stop + 1);
       reader.readAsText(blob);
-    
       reader.onloadend = function(evt) {
         if (evt.target.readyState == FileReader.DONE) { // DONE == 2
-          document.getElementById('byte_content').innerHTML = evt.target.result;
-          var xml = blob,
-  xmlDoc = $.parseXML( xml ),
-  $xml = $( xmlDoc ),
-  $place = $xml.find( "placeName" );
- 
-$place.css('font-weight', 'bold');
-
+          // Chargement du contenu du fichier dans le bloc d'identifiant #byte_content
+          $('#byte_content').html(evt.target.result);
+          var xml = $('#byte_content').html();
+          var xmlDoc = $.parseXML( xml );
+          var $xml = $( xmlDoc );
+          // Passage en gras des noms de lieux (balises placename) :
+          $("placename").css("font-weight","bold");
         }
       };
 
@@ -66,12 +65,14 @@ $place.css('font-weight', 'bold');
     }
     
     document.querySelector('.readBytesButtons').addEventListener('click', function(evt) {
+
       if (evt.target.tagName.toLowerCase() == 'button') {
         var startByte = evt.target.getAttribute('data-startbyte');
         var endByte = evt.target.getAttribute('data-endbyte');
         readBlob(startByte, endByte);
       }
     }, false);
+    
   </script>
   </body>
   
