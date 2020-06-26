@@ -1,5 +1,5 @@
 <?php
- session_start();
+session_start();
 $db = new PDO('mysql:host=localhost;dbname=stage;port=3306', 'root', '');
 
 $requete= "INSERT INTO user VALUES (NULL,:nom,:email,:passwd)";

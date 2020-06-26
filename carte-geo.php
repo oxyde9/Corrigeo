@@ -2,14 +2,14 @@
 <html>
 	<SCRIPT TYPE="text/javascript" SRC="https://ajax.googleapis.com/ajax/libs/jquery/2.1.3/jquery.min.js"></SCRIPT>
 
-	<script src="https://unpkg.com/leaflet@1.6.0/dist/leaflet.js"
-	  integrity="sha512-gZwIG9x3wUXg2hdXF6+rVkLF/0Vi9U8D2Ntg4Ga5I5BZpVkVxlJWbSQtXPSiUTtC0TjtGOmxa1AJPuV0CPthew=="
-	  crossorigin=""></script>
 	
 	<head>
 	   <title>Corrigeo</title>
 	   <meta http-equiv="Content-Type" content="text/html; charset=UTF8" />
 	
+	   <script src="https://unpkg.com/leaflet@1.6.0/dist/leaflet.js"
+	  integrity="sha512-gZwIG9x3wUXg2hdXF6+rVkLF/0Vi9U8D2Ntg4Ga5I5BZpVkVxlJWbSQtXPSiUTtC0TjtGOmxa1AJPuV0CPthew=="
+	  crossorigin=""></script>
 	   <!-- Chargement de la feuille de style de Leaflet -->
 	   <link rel="stylesheet" href="https://unpkg.com/leaflet@1.6.0/dist/leaflet.css"
 	  integrity="sha512-xwE/Az9zrjBIphAcBb3F6JVqxf46+CDLwfLMHloNu6KEQCAWi6HcDUbeOfBIptF7tcCzusKFjFw2yuvEpDL9wQ=="
@@ -20,11 +20,9 @@
 	<body style="background-color:white;font-size:12pt;font-family:Calibri;margin:0px;padding:0px">
 <!-- Emplacement de la carte  -->
 	<div id="map" class="map map-home" style="margin:0px;padding:0px;height: 100vh"></div>
-	
 
-	
 	<SCRIPT TYPE="text/javascript">
-	
+	<?php include("config.php");?>
 //Création de la carte Leaflet
 	var map = L.map('map').setView([0,0], 13);
 	
@@ -39,33 +37,50 @@
 	$.get("http://api.ipapi.com/check?access_key=594c70b41fa4633610a7f80f14d28122&format=1").done(function(data){
 	   
 	//Afficher dans la console la latitude et la longitude récupérées 
-	   console.log(data.latitude+"-"+data.longitude);
-	   console.log(data)
+	 
+
 	
 	  // Centrer la carte sur le point ciblé 
-	   map.setView([data.latitude,data.longitude],7);
+	   map.setView([data.latitude,data.longitude],6);
 	   
 
                 
-                var ville = "Paris";
-           
+                var ville = "Lyon";
+           //faire un appel ajx de la bdd "api.php?action=read&nom="+ville
                     $.ajax({
                         url: "https://nominatim.openstreetmap.org/search", // URL de Nominatim
                         type: 'get', // Requête de type GET
                         data: "q="+ville+"&format=json&addressdetails=1&limit=1&polygon_svg=1" // Données envoyées (q -> adresse complète, format -> format attendu pour la réponse, limit -> nombre de réponses attendu, polygon_svg -> fournit les données de polygone de la réponse en svg)
                     }).done(function (response) {
-                      
-                           var userlat = response[0]['lat'];
-                            var userlon = response[0]['lon'];
-                   
-							
-   
-                    }) 
-         
-        
-			L.marker([userlat,userlon]).addTo(map)
-		.bindPopup('<strong><span style="font-size:2em;">Paris</span></strong>')
-		.openPopup();
+						
+                      // boucle pour parcourir tous les resultats et ajouter un marqueur a tous les resultats voir la liste des lieux candidats
+                           lat = response[0]['lat'];
+                             lon = response[0]['lon'];
+                   console.log(lat);
+				   console.log(lon);
+				 
+		//appelle ajax de api.php?action=write&nom=var1&lat=var2&lon=var3
+		
+		$.ajax({
+		
+		url: "api.php", // URL de Nominatim
+		type: 'get', // Requête de type GET
+		data: "action=write&name="+ville+"&lat="+lat+"&lon="+lon+"" // Données envoyées
+	}) 
+		
+					}) 
+
+				<?php
+					$requete = "SELECT * FROM geoloc";
+$stmt = $db->query($requete);
+$result=$stmt->fetchall(PDO::FETCH_ASSOC);
+
+foreach ($result as $row){
+    echo "	L.marker([".$row["lat"].",".$row["lon"]."]).addTo(map).bindPopup('<strong><span style=\"font-size:2em;\">".$row["name"]."</span></strong>').openPopup();";
+}
+?>
+
+				
 //Placer le marqueur sur le point ciblé 
 	  /* 
 		L.marker([48.859116,2.331839]).addTo(map)

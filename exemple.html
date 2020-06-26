@@ -1,0 +1,79 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Document</title>
+</head>
+<body>
+
+	<SCRIPT TYPE="text/javascript" SRC="https://ajax.googleapis.com/ajax/libs/jquery/2.1.3/jquery.min.js"></SCRIPT>
+    <script>
+    $(document).ready(function(){
+        function chercher(){
+    var ville = "Paris";
+    
+        $.ajax({
+            url: "https://nominatim.openstreetmap.org/search", // URL de Nominatim
+            type: 'get', // Requête de type GET
+            data: "q="+ville+"&format=json&addressdetails=1&limit=1&polygon_svg=1" // Données envoyées (q -> adresse complète, format -> format attendu pour la réponse, limit -> nombre de réponses attendu, polygon_svg -> fournit les données de polygone de la réponse en svg)
+        }).done(function (response) {
+          
+                userlat = response[0]['lat'];
+                userlon = response[0]['lon'];
+              var lat = userlat; 
+              var lon = userlon;
+                    
+        })
+     
+    
+}
+chercher();
+
+    });
+    
+   
+</script>
+
+
+  <!-- 
+    require_once("connect.php");
+  
+
+    // Préparation de la requête SQL. Celle-ci sélectionnera tous les points dont la "distance" sera inférieure à la distance choisie par l'utilisateur
+    // Cette distance est issue du calcul commençant par 6371, qui permet de travailler en kilomètres
+    $sql = "SELECT id, nom, lat, lon, ( 6371 * acos( cos( radians(".$_POST['lat'].") ) * cos( radians( lat ) ) * cos( radians( lon ) - radians(".$_POST['lon'].") ) + sin( radians(".$_POST['lat'].") ) * sin( radians( lat ) ) ) ) AS distance FROM points HAVING distance < ".$distance." ORDER BY distance";
+
+    $query = $db->prepare($sql);
+    $query->execute();
+    $result = $query->fetchAll();
+    echo json_encode($result);
+
+    require_once("close.php");
+ -->
+
+
+
+<!-- 
+
+ function get_lat_lng( $address ) {
+    $address = rawurlencode( $address );
+    $coord   = get_transient( 'geocode_' . $address );
+    if( empty( $coord ) ) {
+        $url  = 'http://nominatim.openstreetmap.org/?format=json&addressdetails=1&q=' . $address . '&format=json&limit=1';
+        $json = wp_remote_get( $url );
+        if ( 200 === (int) wp_remote_retrieve_response_code( $json ) ) {
+            $body = wp_remote_retrieve_body( $json );
+            $json = json_decode( $body, true );
+        }
+
+        $coord['lat']  = $json[0]['lat'];
+        $coord['long'] = $json[0]['lon'];
+        set_transient( 'geocode_' . $address, $coord, DAY_IN_SECONDS * 90 );
+    }
+    return $coord;
+
+} -->
+</body>
+</html>
+

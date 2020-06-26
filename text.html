@@ -1,0 +1,87 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+  <meta charset="utf-8" />
+  <title>Ouvrir, modifier, enregistrer un fichier</title>
+  <style>
+ 
+  textarea {
+    display: block;
+    border: solid thin #6cf;
+    padding: 1px;
+    width: 100%;
+    max-height: 24em;
+    overflow: auto;
+  }
+ 
+  </style>
+</head>
+<body>
+ 
+<input type="file" />
+ 
+<script> 
+"use strict";
+ 
+const regex = /<content>\s*{Nom_produit}\s*<\/content>/g;
+ 
+function highlightText($textarea) {
+  $textarea.focus();
+  let match = regex.exec($textarea.value);
+  if (match) {
+    let j = regex.lastIndex;
+    let i = j - match[0].length;
+    $textarea.setSelectionRange(i, j);
+    regex.lastIndex = 0;
+  }
+}
+ 
+document.querySelector("input[type=file]")
+  .addEventListener("change", (event) => {
+    let file = event.target.files[0];
+    if (!file) {
+      console.log("Aucun fichier sélectionné");
+      return;
+    }
+    else {
+      console.log(file);
+      let reader = new FileReader();
+ 
+      reader.onload = () => {
+        let $ta = document.querySelector("textarea");
+        let $button = document.querySelector("button");
+        if (!$ta) {
+          $ta = document.createElement("textarea");
+          $ta.cols = 80;
+          $ta.rows = 15;
+          $button = document.createElement("button");
+          $button.textContent = "Enregistrer";
+ 
+          document.body.append($ta, $button);
+ 
+          $button.onclick = () => {
+            let blob = new Blob([ $ta.value ], { type: "text/xml" });
+            let blobUrl = URL.createObjectURL(blob);
+ 
+            let $a = document.createElement("a");
+            $a.download = file.name;
+            $a.href = blobUrl;
+ 
+            document.body.append($a);
+            $a.click();
+            $a.remove();
+            URL.revokeObjectURL(blobUrl);
+          };
+        }
+ 
+        $ta.value = reader.result;
+        highlightText($ta);
+      };
+ 
+      reader.readAsText(file);
+    }
+  });
+ 
+</script>
+</body>
+</html>
