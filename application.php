@@ -44,7 +44,7 @@
 </style>
 
 <body>
-  <?php session_start()?>
+  <?php session_start();?>
 
   <?php include("config.php");?>
   <div class="container">
@@ -80,6 +80,8 @@ echo "Bonjour {$_SESSION["iduser"]}"; }
 
   <script src='https://cdnjs.cloudflare.com/ajax/libs/jquery/3.1.0/jquery.min.js'></script>
   <script>
+  $(document).ready(function(){
+  console.log("debut du js");
     var map = L.map('map').setView([0, 0], 13);
 
 
@@ -88,8 +90,10 @@ echo "Bonjour {$_SESSION["iduser"]}"; }
       minZoom: 1,
       maxZoom: 20
     }).addTo(map);
+
     $.get("http://api.ipapi.com/check?access_key=594c70b41fa4633610a7f80f14d28122&format=1").done(function (
           data) {
+            console.log("debut du js 2");
           map.setView([data.latitude, data.longitude], 6);
 
           function readBlob(opt_startByte, opt_stopByte) {
@@ -133,11 +137,16 @@ echo "Bonjour {$_SESSION["iduser"]}"; }
                 //ajouter id a chaque placename 
                 //faire un appel api.php?action=addText
                 /* $.get("api.php?action=addText&text=" + encodeURI(te))  */
-                $.ajax({
-                  url: "api.php", // URL de Nominatim
-                  type: 'post', // Requête de type GET
+
+                //enregistrement du texte en base de données
+                //probleme avec cette partie 
+            /*     $.ajax({
+                  url: "api.php", // URL de l'api text
+                  type: 'post', // Requête de type post
                   data: "action=addText&text=" + te
                 })
+ */
+                
                 //faire des appels api.php?action=addPlacename a chaque placename trouvé
                 /*     $.ajax({
                       url: "api.php", // URL de Nominatim
@@ -148,7 +157,7 @@ echo "Bonjour {$_SESSION["iduser"]}"; }
                 var net = $(".sur");
 
                 var lieux = {};
-
+//liste des lieux sans doublon
                 for (var i = 0; i < net.length; i++) {
 
                   var tab = net.eq(i).html();
@@ -174,9 +183,10 @@ echo "Bonjour {$_SESSION["iduser"]}"; }
                   });
 
                 }
+                console.log("lieux:");
                 console.log(lieux);
                 var selectElem = $("#fromCity");
-
+             
                 // Iterate over object and add options to select
                 for (const property in lieux) {
 
@@ -185,19 +195,28 @@ echo "Bonjour {$_SESSION["iduser"]}"; }
                     value: property,
                     text: property
                   }).appendTo(selectElem);
-                  var ville = property;
-                  var nullVille = 0;
+                }
+                  var ville = lieux[0];
+                  var numVille = 0;
 
                   function treatNextCity() {
-                    var ville = property[nullVille];
+                    if(numVille < Object.keys(lieux).length){
 
+                  
+                    var ville = Object.keys(lieux)[numVille];
+console.log(ville);
+console.log(lieux);
+                      var lat = 44;
+                      var lon = 2;
                     $.ajax({
-                        url: "aplication.php"
+                        url: "application.php",
+                        type: 'get', // Requête de type GET
+                        data: { name: ville }
                       }).done(function (response) {
-                        if (response.length > 0) {
+                        if (response.length > 0 && response[0]['lat'] != undefined ) {
                           console.log(response);
-                          var lat = response[0]['lat'];
-                          var lon = response[0]['lon'];
+                          lat = response[0]['lat'];
+                          lon = response[0]['lon'];
                           console.log(lat);
                           console.log(lon);
                         } else {
@@ -211,8 +230,8 @@ echo "Bonjour {$_SESSION["iduser"]}"; }
 
                             console.log(response);
                             // boucle pour parcourir tous les resultats et ajouter un marqueur a tous les resultats voir la liste des lieux candidats
-                            var lat = response[0]['lat'];
-                            var lon = response[0]['lon'];
+                           lat = response[0]['lat'];
+                             lon = response[0]['lon'];
                             console.log(lat);
                             console.log(lon);
 
@@ -223,13 +242,13 @@ echo "Bonjour {$_SESSION["iduser"]}"; }
                               type: 'get', // Requête de type GET
                               data: "action=write&name=" + ville + "&lat=" + lat + "&lon=" + lon +"" // Données envoyées (q -> adresse complète, format -> format attendu pour la réponse, limit -> nombre de réponses attendu, polygon_svg -> fournit les données de polygone de la réponse en svg)
                             })
-                            nullVille++;
-                            treatNextCity();
+                           
 
                           })
 
                         }
-
+                        //On place des marqueures 
+                        L.marker([lat,lon]).addTo(map).bindPopup('<strong><span style="font-size:2em;">'+ville+'</span></strong>').openPopup();
                       })
                       //verifier si la ville existe deja en base local
                       //faire un appel ajx de la bdd "api.php?action=read&nom="+ville
@@ -273,15 +292,22 @@ echo "Bonjour {$_SESSION["iduser"]}"; }
  
 
                  }) */
-                  }
-                            
-                          /*  }) */
+                 
+                  numVille++;
+                  
+                  setTimeout(() => {
+                    treatNextCity()
+                  }, 3000);
+                } 
+              }
+                treatNextCity();            
+                         
 
 
                      
 
 
-                  }
+               
 
                   $('#byte_content').dblclick(function () { // Au click  dans la div qui a la class .cmd_details faire
                     if (!$(this).children("textarea").length) { // Si il n'y a pas de textarea
@@ -352,7 +378,8 @@ echo "Bonjour {$_SESSION["iduser"]}"; }
                 readBlob(startByte, endByte);
               }
             }, false);
-          })
+          });
+        })
   </script>
 
 </body>
