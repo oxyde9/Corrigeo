@@ -1,5 +1,8 @@
-<?php include("config.php");
-
+<?php 
+header('Access-Control-Allow-Origin: *');
+header('content-type:application/json');
+include("config.php");
+session_start();
 if(isset($_GET["action"])){
     
     if($_GET["action"]=="write"){
@@ -23,12 +26,9 @@ $stmt->execute();
 
         } else 
           { 
-                 //select 
+                 //rien
           }
        
-    
-    
-    
     }
 
      if($_GET["action"]=="read"){
@@ -41,24 +41,25 @@ $stmt->execute();
      }
     
 
-     if($_GET["action"]=="addText"){
-      $texte = $_GET["text"];
- 
+     if($_POST["action"]=="addText"){
+      $texte =urldecode( $_POST["text"]);
+ $iduser = $_SESSION["iduser"];
       //select 
 
-      $sql = "INSERT INTO text( text) VALUES (:texte);";
+      $sql = "INSERT INTO text( text, user_iduser) VALUES (:texte, :user_iduser);";
   
    $req = $db->prepare($sql);
   
-   $req->execute(array(":texte"=>$texte));
+   $req->execute(array(":texte"=>$texte,
+  ":user_iduser"=>$iduser));
   
   }
 }
-  
+ /*  
 $q = $this->db->prepare('UPDATE personnages SET pv = :pv, atk = :atk, name = :name WHERE id = :id');
     
 $q->bindValue(':name', $perso->getName());
 $q->bindValue(':pv', $perso->getPv());
 $q->bindValue(':atk', $perso->getAtk());
 $q->bindValue(':id', $perso->getId());
-$q->execute();
+$q->execute(); */

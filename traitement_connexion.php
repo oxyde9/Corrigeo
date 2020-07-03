@@ -1,5 +1,3 @@
-
-
 <?php session_start();
 
 $db = new PDO('mysql:host=localhost;dbname=stage;port=3306', 'root', '');
@@ -22,8 +20,9 @@ if ($stmt->rowcount()==0) {
 		
 		} else {
 		echo "le passwd est bon, vous etes bien logué";
-		$_SESSION["email"]=$utilisateur["email"];
-		$_SESSION["id"]= $utilisateur["id"];
+
+		$_SESSION["iduser"]= $utilisateur["iduser"];
+		header('Location:application.php');
 		}
 	}
 ?>
