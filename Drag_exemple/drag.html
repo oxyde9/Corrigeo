@@ -1,0 +1,42 @@
+<!DOCTYPE html>
+<html lang="en" >
+<head>
+  <meta charset="UTF-8">
+  <title>CodePen - Leaflet Draggable Marker Example</title>
+  <link rel='stylesheet' href='https://npmcdn.com/leaflet@0.7.7/dist/leaflet.css'>
+
+</head>
+<body>
+<!-- partial:index.partial.html -->
+<div class="example-container">
+<div class="row">
+  <section class="col col-2 header">Location</section>
+  <section class="col col-10">
+    <div class="row">
+      <section class="col col-6">
+        <div id="MapLocation" style="height: 350px"></div>
+      </section>
+    </div>
+    <div class="row">
+      <section class="col col-3">
+        <label class="input">
+          <input id="Latitude" placeholder="Latitude" name="Location.Latitude" />
+          <!-- @Html.TextBoxFor(m => m.Location.Latitude, new {id = "Latitude", placeholder = "Latitude"}) -->
+        </label>
+      </section>
+      <section class="col col-3">
+        <label class="input">
+          <input id="Longitude" placeholder="Longitude" name="Location.Longitude" />
+          <!-- @Html.TextBoxFor(m => m.Location.Longitude, new {id = "Longitude", placeholder = "Longitude"}) -->
+        </label>
+      </section>
+    </div>
+  </section>
+</div>
+</div>
+<!-- partial -->
+  <script src='https://code.jquery.com/jquery-2.2.4.min.js'></script>
+<script src='https://npmcdn.com/leaflet@0.7.7/dist/leaflet.js'></script><script  src="./script.js"></script>
+
+</body>
+</html>

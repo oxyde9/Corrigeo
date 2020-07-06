@@ -73,10 +73,24 @@ echo "Bonjour {$_SESSION["iduser"]}"; }
     <br>
 
     <div id="map" class="map map-home" style="margin:50px;padding:0px;height: 50vh"></div>
+    <div class="row">
+      <section class="col col-3">
+        <label class="input">
+          <input id="Latitude" placeholder="Latitude" name="Location.Latitude" />
+          <!-- @Html.TextBoxFor(m => m.Location.Latitude, new {id = "Latitude", placeholder = "Latitude"}) -->
+        </label>
+      </section>
+      <section class="col col-3">
+        <label class="input">
+          <input id="Longitude" placeholder="Longitude" name="Location.Longitude" />
+          <!-- @Html.TextBoxFor(m => m.Location.Longitude, new {id = "Longitude", placeholder = "Longitude"}) -->
+        </label>
+      </section>
+    </div>
     <div class="back" id="byte_content"></div>
 
   </div>
-  <div id="map" class="map map-home" style="margin:auto;padding:0px;height: 50vh"></div>
+  
 
   <script src='https://cdnjs.cloudflare.com/ajax/libs/jquery/3.1.0/jquery.min.js'></script>
   <script>
@@ -206,8 +220,7 @@ echo "Bonjour {$_SESSION["iduser"]}"; }
                     var ville = Object.keys(lieux)[numVille];
 console.log(ville);
 console.log(lieux);
-                      var lat = 44;
-                      var lon = 2;
+                     
                     $.ajax({
                         url: "application.php",
                         type: 'get', // Requête de type GET
@@ -248,7 +261,30 @@ console.log(lieux);
 
                         }
                         //On place des marqueures 
-                        L.marker([lat,lon]).addTo(map).bindPopup('<strong><span style="font-size:2em;">'+ville+'</span></strong>').openPopup();
+                        //mettre les marqueures dragrables
+                        var marker = new L.marker([lat,lon], {draggable: 'true'});
+                        
+                        //recuperer la position du marqueur
+  marker.on('dragend', function(event) {
+    var position = marker.getLatLng();
+    marker.setLatLng(position, {
+      draggable: 'true'
+    }).bindPopup(position).update();
+    $("#Latitude").val(position.lat);
+    $("#Longitude").val(position.lng).keyup();
+  });
+
+  //montrer dans les input les changements de deplacement des marqueurs
+  $("#Latitude, #Longitude").change(function() {
+    var position = [parseInt($("#Latitude").val()), parseInt($("#Longitude").val())];
+    marker.setLatLng(position, {
+      draggable: 'true'
+    }).bindPopup(position).update();
+    map.panTo(position);
+  });
+
+                          map.addLayer(marker);
+                      /*   L.marker([lat,lon]).addTo(map).bindPopup('<strong><span style="font-size:2em;">'+ville+'</span></strong>').openPopup(); */
                       })
                       //verifier si la ville existe deja en base local
                       //faire un appel ajx de la bdd "api.php?action=read&nom="+ville
@@ -297,7 +333,7 @@ console.log(lieux);
                   
                   setTimeout(() => {
                     treatNextCity()
-                  }, 3000);
+                  }, 2000);
                 } 
               }
                 treatNextCity();            

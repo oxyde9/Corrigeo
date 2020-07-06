@@ -70,17 +70,39 @@
 		
 					}) 
 
-				<?php
-					$requete = "SELECT * FROM geoloc";
+		
+
+<?php
+	$requete = "SELECT * FROM geoloc";
 $stmt = $db->query($requete);
 $result=$stmt->fetchall(PDO::FETCH_ASSOC);
 
 foreach ($result as $row){
-    echo "	L.marker([".$row["lat"].",".$row["lon"]."]).addTo(map).bindPopup('<strong><span style=\"font-size:2em;\">".$row["name"]."</span></strong>').openPopup();";
+    echo " var marker = new L.marker([".$row["lat"].",".$row["lon"]."], {draggable: 'true'}); marker.on('dragend', function(event) {var position = marker.getLatLng();marker.setLatLng(position, {draggable: 'true'}).bindPopup(position).update();});map.addLayer(marker);";
 }
 ?>
+   var marker = new L.marker(curLocation, {
+    draggable: 'true'
+  });
 
-				
+  marker.on('dragend', function(event) {
+    var position = marker.getLatLng();
+    marker.setLatLng(position, {
+      draggable: 'true'
+    }).bindPopup(position).update();
+    $("#Latitude").val(position.lat);
+    $("#Longitude").val(position.lng).keyup();
+  });
+
+  $("#Latitude, #Longitude").change(function() {
+    var position = [parseInt($("#Latitude").val()), parseInt($("#Longitude").val())];
+    marker.setLatLng(position, {
+      draggable: 'true'
+    }).bindPopup(position).update();
+    map.panTo(position);
+  });
+
+  map.addLayer(marker);
 //Placer le marqueur sur le point ciblé 
 	  /* 
 		L.marker([48.859116,2.331839]).addTo(map)
